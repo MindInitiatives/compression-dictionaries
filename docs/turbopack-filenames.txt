@@ -1,0 +1,18 @@
+# Turbopack chunk filenames
+# Produced by: node next build (default Turbopack builder, Next.js 16.3.6)
+# Source: examples/nextjs app (v1 content, no release overlays)
+# Measured on: Darwin arm64, 2026-09-26
+
+static/chunks:
+0bma92pht_c97.js
+0cz1d0mv5g_q7.js
+19mx3mg6lkumu.js
+1mpnoxox0-4cg.js
+2-rtuqsgzmno4.js
+2ysbendh-lctt.js
+310vm2bl3xxpt.js
+3fntmmi971322.js
+turbopack-43vu1xwipchft.js
+
+Note: Turbopack produces content-addressed names (no stable name prefix).
+The next-webpack preset cannot pair these across releases.

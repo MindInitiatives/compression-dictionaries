@@ -8,6 +8,10 @@ Angular's production build uses 8-character uppercase alphanumeric hashes, such 
 
 Setting `namedChunks: true` in the production configuration in `angular.json` changes that. The same chunk becomes `transfers.component-VAQA7ZJ7.js`, with the component name as the stable prefix. `build-deltas` can now pair it across releases and compute a delta.
 
+## The anonymous shared chunk
+
+The build also produces a `chunk-XXXXXXXX.js` file that is roughly 176 KB. This chunk holds shared vendor code that Angular extracts automatically. It has no name in Angular's build graph, so no supported Angular CLI setting can give it a stable prefix. `build-deltas` detects the name `chunk` as unstable and skips it. A CDN can still compress it with Brotli, but it cannot be paired as a dictionary across releases.
+
 ## How namedChunks changes the output
 
 Without `namedChunks: true`:

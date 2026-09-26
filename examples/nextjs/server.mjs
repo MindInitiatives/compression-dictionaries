@@ -1,12 +1,14 @@
-// Demo server. Serves whichever release is named in releases/current.txt.
-// Uses the same dictionaryDeltas middleware as the other examples; the static
-// export means we do not need to run Next.js at serve time.
+// Custom server: run dictionaryDeltas before handing requests to Next.js.
+// The delta middleware intercepts /_next/static/chunks requests and serves
+// a prebuilt dcz delta when the browser holds a previous version as a dictionary.
+// All other requests, including page rendering, go to Next.js as normal.
 
 import express from 'express'
-import { readFileSync, existsSync, statSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import next from 'next'
+import { readFileSync, existsSync } from 'node:fs'
+import { join, dirname, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { dictionaryDeltas, compressedStatic } from '@compression-dictionaries/core/middleware'
+import { dictionaryDeltas } from '@compression-dictionaries/core/middleware'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const releasesDir = join(here, 'releases')
@@ -16,52 +18,35 @@ if (!existsSync(join(releasesDir, 'current.txt'))) {
   process.exit(1)
 }
 
-const current = () => readFileSync(join(releasesDir, 'current.txt'), 'utf8').trim()
-const releasePath = (...parts) => join(releasesDir, current(), ...parts)
+const current = readFileSync(join(releasesDir, 'current.txt'), 'utf8').trim()
+const releaseDir = join(releasesDir, current)
+const manifest = JSON.parse(readFileSync(join(releaseDir, 'deltas', 'manifest.json'), 'utf8'))
 
-let manifestCache = { release: null, value: null }
-const manifest = () => {
-  if (manifestCache.release !== current()) {
-    manifestCache = {
-      release: current(),
-      value: JSON.parse(readFileSync(releasePath('deltas', 'manifest.json'), 'utf8')),
-    }
-  }
-  return manifestCache.value
-}
+// next.config.mjs reads NEXT_DIST_DIR to set distDir. Set it here so
+// Next.js picks up the correct release directory. Pass a path relative to
+// `here` because Next.js resolves distDir with path.join(dir, distDir).
+const distDir = relative(here, join(releaseDir, '.next'))
+process.env.NEXT_DIST_DIR = distDir
 
-const log = (line) => console.log(`[${current()}] ${line}`)
-const app = express()
-app.disable('x-powered-by')
+// Load the Next.js built app from this release's .next directory.
+const app = next({ dev: false, dir: here })
+const handle = app.getRequestHandler()
+await app.prepare()
 
-app.use(dictionaryDeltas({ manifest, deltasDir: () => releasePath('deltas'), log }))
+const server = express()
+server.disable('x-powered-by')
 
-// /_next/static/ assets are content-hashed and immutable once deployed.
-app.use(compressedStatic({
-  root: () => releasePath(),
-  cacheControl: (path) =>
-    path.startsWith('_next/static/') ? 'public, max-age=31536000, immutable' : 'no-cache',
-  log,
+server.use(dictionaryDeltas({
+  manifest: () => manifest,
+  deltasDir: () => join(releaseDir, 'deltas'),
+  log: (line) => console.log(`[${current}] ${line}`),
 }))
 
-// Serve HTML pages for Next.js static export routes.
-// The export writes /transfers → transfers.html rather than transfers/index.html,
-// so we add the .html suffix when looking up the file on disk.
-app.use((req, res) => {
-  const htmlPath = req.path === '/' ? 'index.html' : req.path.replace(/^\//, '') + '.html'
-  const filePath = releasePath(htmlPath)
-  try {
-    if (statSync(filePath).isFile()) {
-      res.set('Cache-Control', 'no-cache')
-      res.sendFile(filePath)
-      return
-    }
-  } catch { /* file not found */ }
-  res.status(404).send('Not found')
-})
+// Pass everything else to Next.js: static assets, page rendering, and routes.
+server.use((req, res) => handle(req, res))
 
 const port = Number(process.env.PORT ?? 3003)
-app.listen(port, () => {
-  console.log(`Demo running at http://localhost:${port} (release ${current()})`)
-  console.log('Open it in a Chromium-based browser with DevTools open on the Network tab.')
+server.listen(port, () => {
+  console.log(`Demo running at http://localhost:${port} (release ${current})`)
+  console.log('To switch releases, run `npm run release -- v2` then restart with `npm run serve`.')
 })

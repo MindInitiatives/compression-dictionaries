@@ -39,7 +39,7 @@ app.use(dictionaryDeltas({ manifest, deltasDir: () => releasePath('deltas'), log
 app.use(compressedStatic({
   root: () => releasePath('browser'),
   cacheControl: (path) =>
-    /\.[0-9A-Z]{8}\.(js|css)$/.test(path) ? 'public, max-age=31536000, immutable' : 'no-cache',
+    /-[0-9A-Z]{8}\.(js|css)$/.test(path) ? 'public, max-age=31536000, immutable' : 'no-cache',
   log,
 }))
 

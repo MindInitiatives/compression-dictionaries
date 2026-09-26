@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  // Disable image optimisation since it is not available with static export.
-  images: { unoptimized: true },
+  // Allow the build step to redirect output to a release-specific directory
+  // by setting NEXT_DIST_DIR to an absolute path before running `next build`.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
 }
 
 export default nextConfig

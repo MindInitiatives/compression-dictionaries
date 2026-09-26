@@ -10,4 +10,4 @@ if (!name || !existsSync(join(here, 'releases', name))) {
   process.exit(1)
 }
 writeFileSync(join(here, 'releases', 'current.txt'), name)
-console.log(`Now serving release ${name}. Reload the page in your browser.`)
+console.log(`Current release is now ${name}. Restart the server with \`npm run serve\` to apply it.`)

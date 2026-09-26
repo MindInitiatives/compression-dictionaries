@@ -1,6 +1,6 @@
 # Next.js
 
-This example applies Compression Dictionary Transport to a Next.js 16 app using the App Router and static export. It documents which bundler to use and why, and shows how a plain Express server adds the compression dictionary negotiation in front of the pre-built static files.
+This example applies Compression Dictionary Transport to a Next.js 16 app using the App Router and a custom Express server. It documents which bundler to use and why, and shows how the delta middleware fits into a server that also hands requests to Next.js's own handler.
 
 ## Turbopack versus webpack
 
@@ -16,11 +16,12 @@ The dashboard and product pages in this example are React server components. The
 
 The Transfers page uses `'use client'` and ships actual JavaScript. When the fee estimate feature is added in v2, that JavaScript changes, the hash changes, and `build-deltas` produces a delta.
 
-| Bundle | Raw | Brotli | dcz (v1 to v2) |
+| Bundle | Raw (v2) | Brotli (v2) | dcz (v1 to v2) |
 |---|---|---|---|
 | Transfers page chunk (`app/transfers/page-*.js`) | 2.2 KB | 0.9 KB | 0.2 KB |
+| Main app entry (`main-app-*.js`) | 0.5 KB | 0.2 KB | — |
 
-These figures were measured on a MacBook running Node.js 24.21.0.
+The main app entry hash is stable across all three releases because it contains only the Next.js App Router bootstrap code and does not embed any release-specific content. It gets a `Use-As-Dictionary` response header on the first visit but there is no delta to deliver on subsequent visits. These figures were measured on a MacBook running Node.js 24.21.0.
 
 ## Dynamic route segments
 
@@ -37,29 +38,34 @@ npm run releases    # builds v1, v2 and v3, then computes deltas
 npm run serve       # serves v1 at http://localhost:3003
 ```
 
-Open the app in a Chromium-based browser with DevTools on the Network tab. Add the Content-Encoding column. Navigate to the Transfers page so the browser downloads and stores the transfers chunk.
+Open the app in a Chromium-based browser with DevTools on the Network tab. Add the Content-Encoding column. Navigate to the Transfers page so the browser downloads and stores the transfers chunk as a dictionary.
 
-Switch to v2 and reload.
+To switch to v2, update `current.txt` and restart the server.
 
 ```bash
 npm run release -- v2
+npm run serve
 ```
 
 The transfers chunk should now arrive as `dcz`.
 
 ## How the demo server works
 
-This example uses `output: 'export'` in `next.config.mjs`, which produces a flat static site in an `out/` directory. The demo server in `server.mjs` is a plain Express app that serves those files directly: it adds the delta middleware before the static handler, and maps URL paths to `.html` files for routes like `/transfers`.
+The server in `server.mjs` is a custom Express app that loads Next.js at startup and calls `app.getRequestHandler()` to obtain a handler for all requests. The `dictionaryDeltas` middleware runs before the Next.js handler: when a request carries `Available-Dictionary` and a matching delta exists, the middleware serves the delta and the Next.js handler is not called. When no delta applies, the middleware sets the `Use-As-Dictionary` and `Vary` headers and calls `next()`, and Next.js handles the request as normal.
 
-This approach suits the "switch between releases" demo. In a real application you would run `next start` with a custom Express server that calls `next()` for the handler, and add `dictionaryDeltas` before it. A custom server opts out of some of Next.js's own optimisations, such as automatic static acceleration; check the Next.js documentation for your hosting platform before adopting it.
+Each release is built to its own `.next` directory (`releases/vN/.next`). The server reads `releases/current.txt` at startup to decide which release to load. Switching releases therefore requires a server restart, which is why `npm run release -- v2` prints a reminder to restart.
+
+The custom server does not apply any content encoding to static assets. Brotli or gzip compression would normally be handled by a CDN or reverse proxy in front of the server. When a browser sends an `Available-Dictionary` header but no matching delta exists, the middleware sets the required headers and passes the request to Next.js, which returns the raw file with no `Content-Encoding` header.
+
+A real application would normally run `next start` rather than a custom server. A custom server opts out of some of Next.js's own optimisations; check the Next.js documentation for your hosting platform before adopting this pattern.
 
 ## Running the tests
 
-`npm test` regenerates all three releases and then runs a negotiation test over HTTP. The test checks that the main-app chunk is served with a `Use-As-Dictionary` header, that a browser holding the v1 transfers chunk receives a `dcz` delta for v2, and that an unknown dictionary falls back to Brotli.
+`npm test` regenerates all three releases and then runs a negotiation test over HTTP. The test starts the server on v2, reads the v1 transfers chunk from disk to simulate a browser that holds the old bundle, then requests the v2 URL with `Available-Dictionary` set to v1's hash. It checks that the response is a valid dcz delta and that an unknown dictionary does not produce a dcz response.
 
 ## Shared-dictionary compression
 
-Product pages are server-rendered HTML in this app, but they are generated statically at build time rather than streamed. Because the pages are static files served directly, the `sharedDictionary` middleware could in principle compress them against a shared template. This is not shown here, as the vanilla example already demonstrates the pattern clearly.
+Product pages are server-rendered HTML in this app, generated statically at build time. Because the pages are served by Next.js directly, the `sharedDictionary` middleware is not used here. The vanilla example already demonstrates that pattern clearly.
 
 ## Hosting note
 

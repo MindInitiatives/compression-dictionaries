@@ -5,7 +5,7 @@
 // do not carry a stable prefix, so they cannot be paired across releases.
 
 import { cpSync, mkdirSync, rmSync, copyFileSync, writeFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { join, dirname, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 
@@ -52,21 +52,25 @@ function applyOverlay(version) {
 async function buildRelease(name, previousNames) {
   if (!quiet) console.log(`\nBuilding ${name}...`)
 
-  // Build with the webpack bundler. Turbopack does not produce stable name
-  // prefixes in filenames, so the next-webpack preset cannot pair files
-  // across releases.
+  // next.config.mjs reads NEXT_DIST_DIR to set distDir. Next.js resolves
+  // distDir with path.join(projectDir, distDir), so we must pass a path
+  // relative to workDir rather than an absolute path.
+  const distDir = join(releasesDir, name, '.next')
+  const relDistDir = relative(workDir, distDir)
+
   execFileSync(
     process.execPath,
     [next, 'build', '--webpack', workDir],
-    { cwd: workDir, stdio: quiet ? 'ignore' : 'inherit' },
+    {
+      cwd: workDir,
+      stdio: quiet ? 'ignore' : 'inherit',
+      env: { ...process.env, NEXT_DIST_DIR: relDistDir },
+    },
   )
 
-  const outDir = join(releasesDir, name)
-  cpSync(join(workDir, 'out'), outDir, { recursive: true })
-
-  const chunksDir = join(outDir, '_next', 'static', 'chunks')
+  const chunksDir = join(distDir, 'static', 'chunks')
   const previous = previousNames.flatMap((n) => [
-    '--previous', join(releasesDir, n, '_next', 'static', 'chunks'),
+    '--previous', join(releasesDir, n, '.next', 'static', 'chunks'),
   ])
 
   execFileSync(
@@ -77,7 +81,7 @@ async function buildRelease(name, previousNames) {
       '--current', chunksDir,
       ...previous,
       '--public-path', '/_next/static/chunks',
-      '--out', join(outDir, 'deltas'),
+      '--out', join(releasesDir, name, 'deltas'),
     ],
     { stdio: quiet ? 'ignore' : 'inherit' },
   )

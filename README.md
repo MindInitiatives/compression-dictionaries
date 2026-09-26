@@ -46,7 +46,7 @@ The app bundle should now arrive as `dcz`, and the server log shows which dictio
 
 Run `npm test` at the root to run every test in the repository.
 
-To see the feature working in a real browser, run `npm run verify:browser`. It launches a headless Chromium, loads v1, switches to v2 and checks that the bundles arrive as `dcz`. It runs against `examples/vanilla` and `examples/react-vite`, which must have releases already built.
+To see the feature working in a real browser, run `npm run verify:browser`. It launches a headless Chromium, loads v1, switches to v2 and checks that the bundles arrive as `dcz`. It runs against `examples/vanilla` and `examples/react-vite` (required), and also against `examples/angular` and `examples/nextjs` when their releases have been built. The Next.js check restarts the server between v1 and v2 because that example's custom server loads a release at startup.
 
 ## What the vanilla example shows
 

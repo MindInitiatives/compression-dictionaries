@@ -32,3 +32,21 @@ test("numeric chunk names are flagged as unstable", () => {
 test("files that do not match the preset are ignored", () => {
   assert.equal(parseAssetPath("favicon.ico", presets.vite), null);
 });
+
+test("paths with bracket characters are marked unsafe for URLPattern", () => {
+  // Next.js dynamic routes like app/products/[id]/page-xxxx.js contain brackets.
+  // URLPattern treats [id] as a character class, so build-deltas must skip these
+  // paths rather than produce an invalid match pattern.
+  const parsed = parseAssetPath("chunks/app/products/[id]/page-0123456789abcdef.js", presets["next-webpack"]);
+  assert.notEqual(parsed, null);
+  assert.equal(parsed.patternSafe, false, "square brackets make the path unsafe for URLPattern");
+});
+
+test("Turbopack content-addressed names are not recognised by next-webpack preset", () => {
+  // Turbopack produces content-addressed IDs with no stable name prefix,
+  // such as 0bma92pht_c97.js and 0cz1d0mv5g_q7.js. The next-webpack preset
+  // requires a stable name followed by a 16-hex hash; without a stable prefix
+  // these files return null and are skipped by build-deltas.
+  assert.equal(parseAssetPath("chunks/0bma92pht_c97.js", presets["next-webpack"]), null);
+  assert.equal(parseAssetPath("chunks/0cz1d0mv5g_q7.js", presets["next-webpack"]), null);
+});
