@@ -1,0 +1,38 @@
+{
+  "name": "@compression-dictionaries/example-angular",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Angular with SSR example with delta-compressed bundles and a lazy-loaded transfers route",
+  "scripts": {
+    "ng": "ng",
+    "build": "ng build",
+    "releases": "node releases.mjs",
+    "serve": "node server.mjs",
+    "release": "node switch-release.mjs",
+    "test": "node releases.mjs --quiet && node --test"
+  },
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/platform-server": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@angular/ssr": "^22.2.0",
+    "@compression-dictionaries/core": "*",
+    "@compression-dictionaries/demo-content": "*",
+    "express": "^5.2.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.0",
+    "@angular/cli": "^22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.12.0",
+    "typescript": "~6.0.2"
+  },
+  "license": "MIT"
+}
