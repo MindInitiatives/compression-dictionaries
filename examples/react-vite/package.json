@@ -1,0 +1,27 @@
+{
+  "name": "@compression-dictionaries/example-react-vite",
+  "version": "0.2.0",
+  "private": true,
+  "description": "React with Vite example with delta-compressed bundles and a lazy-loaded transfers route",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "releases": "node releases.mjs",
+    "serve": "node server.mjs",
+    "release": "node switch-release.mjs",
+    "test": "node releases.mjs --quiet && node --test"
+  },
+  "dependencies": {
+    "@compression-dictionaries/core": "*",
+    "@compression-dictionaries/demo-content": "*",
+    "express": "^5.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.1"
+  },
+  "license": "MIT"
+}
