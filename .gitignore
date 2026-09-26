@@ -3,6 +3,7 @@ examples/*/releases/
 examples/*/.release-work/
 dist/
 .next/
+examples/nextjs/out/
 .angular/
 .DS_Store
 CLAUDE.md

@@ -1,0 +1,20 @@
+{
+  "name": "@compression-dictionaries/example-nextjs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "releases": "node releases.mjs",
+    "serve": "node server.mjs",
+    "release": "node switch-release.mjs",
+    "test": "node releases.mjs --quiet && node --test"
+  },
+  "dependencies": {
+    "@compression-dictionaries/core": "*",
+    "@compression-dictionaries/demo-content": "*",
+    "express": "^5.2.1",
+    "next": "^16.3.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

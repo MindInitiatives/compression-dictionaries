@@ -9,7 +9,7 @@
 // Options that describe the current release (root, manifest, deltasDir) accept
 // either a value or a function, so a server can switch releases without a restart.
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join, normalize, extname } from "node:path";
 import zlib from "node:zlib";
 import {
@@ -119,7 +119,9 @@ export function compressedStatic({ root, cacheControl = () => "no-cache", log = 
     if (relative.includes("..")) return res.status(400).end();
 
     const path = join(base, relative);
-    if (!existsSync(path)) return next();
+    let stat;
+    try { stat = statSync(path) } catch { return next() }
+    if (!stat.isFile()) return next();
 
     const raw = readFileSync(path);
     res.set("Content-Type", CONTENT_TYPES[extname(path)] ?? "application/octet-stream");

@@ -29,7 +29,7 @@ const UNSTABLE_NAME = /^(\d+|chunk)$/;
 
 // Characters with special meaning in URLPattern (or in URLs), which would make
 // the generated `match` pattern mean something other than intended.
-const UNSAFE_FOR_PATTERN = /[:*?+(){}\\#]/;
+const UNSAFE_FOR_PATTERN = /[:*?+(){}\\#\[\]]/;
 
 /**
  * Split a relative file path into its stable key and hash.
