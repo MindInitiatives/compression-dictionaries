@@ -1,0 +1,25 @@
+/* Shared stylesheet for every example, so the four apps look identical. */
+:root { --ink: #1b1f24; --muted: #5b6470; --line: #d8dde3; --accent: #1f4e79; --paper: #ffffff; --positive: #2d6a4f; --negative: #9b2226; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; color: var(--ink); background: var(--paper); }
+header.site { border-bottom: 1px solid var(--line); }
+header.site nav { max-width: 52rem; margin: 0 auto; padding: 1rem 1.25rem; display: flex; gap: 1.5rem; align-items: baseline; }
+header.site .brand { font-weight: 600; margin-right: auto; }
+main { max-width: 52rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 0.5rem; font-weight: 600; }
+h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; font-weight: 600; }
+p { margin: 0 0 1rem; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 0.5rem 0.25rem; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--muted); font-size: 0.9rem; }
+td.amount { text-align: right; }
+td.amount.in { color: var(--positive); }
+td.amount.out { color: var(--negative); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+form.transfer { display: grid; gap: 1rem; max-width: 28rem; }
+label { display: grid; gap: 0.25rem; font-weight: 600; }
+input, select { font: inherit; padding: 0.5rem 0.6rem; border: 1px solid var(--line); border-radius: 4px; }
+button { font: inherit; padding: 0.6rem 1rem; border: 0; border-radius: 4px; background: var(--accent); color: #fff; cursor: pointer; justify-self: start; }
+.products { columns: 2; padding-left: 1.1rem; }
+@media (max-width: 40rem) { .products { columns: 1; } header.site nav { flex-wrap: wrap; } }

@@ -1,0 +1,8 @@
+node_modules/
+examples/*/releases/
+examples/*/.release-work/
+dist/
+.next/
+.angular/
+.DS_Store
+CLAUDE.md

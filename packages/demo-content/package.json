@@ -1,0 +1,12 @@
+{
+  "name": "@compression-dictionaries/demo-content",
+  "version": "0.2.0",
+  "private": true,
+  "description": "The data every example app renders, so all four implementations show the same banking app",
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs",
+    "./styles.css": "./styles.css"
+  },
+  "license": "MIT"
+}

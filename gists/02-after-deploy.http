@@ -1,0 +1,12 @@
+# After a deploy: the new URL matches the pattern, so the browser sends the
+# SHA-256 of the dictionary it holds. The server replies with a delta.
+
+GET /assets/app-33b06492.js HTTP/2
+Accept-Encoding: gzip, br, zstd, dcb, dcz
+Available-Dictionary: :KOO9gM5DYecTBsQz+4hcBOx265lrTeiJ2QErS5Y/pwA=:
+
+HTTP/2 200
+Content-Encoding: dcz
+Use-As-Dictionary: match="/assets/app-*.js"
+Cache-Control: public, max-age=31536000, immutable
+Vary: Accept-Encoding, Available-Dictionary

@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "your-app": {
+      "architect": {
+        "build": {
+          "configurations": {
+            "production": {
+              "namedChunks": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

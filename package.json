@@ -1,0 +1,19 @@
+{
+  "name": "compression-dictionaries",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Compression Dictionary Transport (dcz) applied to the same small banking app in plain HTML, React with Vite, Angular and Next.js",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.15"
+  },
+  "author": "Stephen Omodu Oloto",
+  "license": "MIT"
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@compression-dictionaries/core",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Build-time delta generation, header helpers and Express middleware for Compression Dictionary Transport (dcz)",
+  "type": "module",
+  "exports": {
+    "./dcz": "./src/dcz.mjs",
+    "./presets": "./src/presets.mjs",
+    "./middleware": "./src/middleware.mjs",
+    "./build-deltas": "./src/build-deltas.mjs"
+  },
+  "bin": {
+    "build-deltas": "./src/build-deltas.mjs"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "express": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": { "optional": true }
+  },
+  "engines": {
+    "node": ">=22.15"
+  },
+  "license": "MIT"
+}
