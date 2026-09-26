@@ -1,6 +1,9 @@
 {
   "scripts": {
     "build": "vite build",
-    "postbuild": "node tools/compression-dictionaries/build-deltas.mjs --preset vite --current dist/assets --previous .previous-assets --public-path /assets --out dist/deltas"
+    "build:deltas": "build-deltas --preset vite --current dist/assets --previous .previous-assets --public-path /assets --out dist/deltas"
+  },
+  "devDependencies": {
+    "@compression-dictionaries/core": "^0.2.0"
   }
 }

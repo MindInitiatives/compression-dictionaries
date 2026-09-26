@@ -3,6 +3,7 @@
     "your-app": {
       "architect": {
         "build": {
+          "builder": "@angular/build:application",
           "configurations": {
             "production": {
               "namedChunks": true

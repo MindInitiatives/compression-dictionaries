@@ -9,9 +9,9 @@ This repository applies that idea to the same small banking app four times, once
 | Folder | Stack | What it shows | Status |
 |---|---|---|---|
 | [`examples/vanilla`](examples/vanilla) | Plain HTML and JavaScript | Delta-compressed bundles, plus a shared dictionary for similar HTML pages | Ready |
-| [`examples/react-vite`](examples/react-vite) | React with Vite | Deltas for the entry bundle and lazy-loaded routes, served by a small Node server | In progress |
-| [`examples/angular`](examples/angular) | Angular | Named chunks, and deltas served from Angular's SSR server | In progress |
-| [`examples/nextjs`](examples/nextjs) | Next.js | Chunk naming in the Next.js build, and a custom server | In progress |
+| [`examples/react-vite`](examples/react-vite) | React with Vite | Deltas for the entry bundle and lazy-loaded Transfers route, served by a small Node server | Ready |
+| [`examples/angular`](examples/angular) | Angular | Named chunks via `namedChunks: true`, and deltas served alongside Angular's SSR output | Ready |
+| [`examples/nextjs`](examples/nextjs) | Next.js | Webpack builder for stable names, server components produce no deltas, only client components do | Ready |
 
 The browser feature is identical in every folder. What changes between them is how each build tool names its files, which decides whether old and new versions can be paired, and where the app is served from, which decides where the negotiation happens.
 
@@ -45,6 +45,8 @@ npm run release -- v2
 The app bundle should now arrive as `dcz`, and the server log shows which dictionary it was compressed against.
 
 Run `npm test` at the root to run every test in the repository.
+
+To see the feature working in a real browser, run `npm run verify:browser`. It launches a headless Chromium, loads v1, switches to v2 and checks that the bundles arrive as `dcz`. It runs against `examples/vanilla` and `examples/react-vite`, which must have releases already built.
 
 ## What the vanilla example shows
 
